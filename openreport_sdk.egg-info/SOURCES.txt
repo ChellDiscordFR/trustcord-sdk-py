@@ -1,0 +1,11 @@
+pyproject.toml
+openreport/__init__.py
+openreport/client.py
+openreport/discord_ext.py
+openreport_sdk.egg-info/PKG-INFO
+openreport_sdk.egg-info/SOURCES.txt
+openreport_sdk.egg-info/dependency_links.txt
+openreport_sdk.egg-info/requires.txt
+openreport_sdk.egg-info/top_level.txt
+tests/test_client.py
+tests/test_discord_ext.py
