@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+tests/test_client.py
+tests/test_discord_ext.py
+tests/test_status.py
+tests/test_validation.py
+trustcord/__init__.py
+trustcord/client.py
+trustcord/discord_ext.py
+trustcord_sdk.egg-info/PKG-INFO
+trustcord_sdk.egg-info/SOURCES.txt
+trustcord_sdk.egg-info/dependency_links.txt
+trustcord_sdk.egg-info/requires.txt
+trustcord_sdk.egg-info/top_level.txt
