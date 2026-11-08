@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: trustcord-sdk
-Version: 1.0.0
+Version: 1.1.0
 Summary: Client and discord.py helpers for the Trustcord register
 License-Expression: MIT
 Requires-Python: >=3.11
@@ -67,22 +67,13 @@ deliberate: an open report is an accusation nobody has examined yet, and the API
 makes it indistinguishable from an account nobody ever named. Nothing here lets
 you sanction on suspicion.
 
-### Public staff roles
+### Staff roles (deprecated)
 
-```python
-from trustcord import StaffRole
-
-status = await client.lookup_status(123456789012345678)
-if status.staff_role is StaffRole.JURY:
-    print("Active Trustcord juror")
-listing = status.listed  # Listing or None, as with lookup().
-```
-
-`Status` exposes `user_id`, `listed` and `staff_role`. The role is `StaffRole.JURY`,
-`StaffRole.ADMIN` or `None`; it does not imply that an NDA has been signed.
-`Listing.staff_role` also exposes the role when an account is listed, including
-results from `lookup_many`. Existing `lookup` and `lookup_many` return types are
-unchanged. Missing or null role fields from older servers become `None`.
+The public API no longer says whether an account sits on the Trustcord staff,
+so that no bot can pick the jurors out of a member list. `Status.staff_role`
+and `Listing.staff_role` are kept for compatibility and are always `None`;
+they will be removed in the next major version. Your users can check a juror
+on trustcord.org or with the official Trustcord bot.
 
 ### A whole member list at once
 

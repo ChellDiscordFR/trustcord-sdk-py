@@ -80,7 +80,7 @@ class Level(enum.StrEnum):
 
 
 class StaffRole(enum.StrEnum):
-    """Public role of an active staff member, whether listed or not."""
+    """Role of an active staff member. Deprecated: the public API no longer sends it."""
 
     JURY = "jury"
     ADMIN = "admin"
@@ -111,7 +111,7 @@ class Listing:
 
 @dataclass(frozen=True, slots=True)
 class Status:
-    """Public lookup, including a staff role for an unlisted account."""
+    """Public lookup. ``staff_role`` is deprecated and always None."""
 
     user_id: str
     listed: Listing | None
@@ -207,7 +207,7 @@ class Trustcord:
         return (await self.lookup_status(user_id)).listed
 
     async def lookup_status(self, user_id: int | str) -> Status:
-        """Read listing and public staff role without hiding unlisted staff."""
+        """Read the listing; ``staff_role`` is deprecated, the API no longer sends it."""
         user_id = str(user_id)
         if re.fullmatch(r"[0-9]{17,20}", user_id) is None:
             raise ValueError("Expected a Discord snowflake with 17 to 20 digits")
