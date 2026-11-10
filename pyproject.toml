@@ -1,6 +1,6 @@
 [project]
 name = "trustcord-sdk"
-version = "1.1.0"
+version = "1.2.0"
 description = "Client and discord.py helpers for the Trustcord register"
 readme = "README.md"
 license = "MIT"

@@ -116,8 +116,13 @@ registry = Registry(client, notice_url="https://trustcord.example/notice")
 async def on_member_join(member):
     listing = await registry.screen(member)   # informs if listed
     if listing and listing.level is Level.HIGH:
-        await member.ban(reason=f"Trustcord {listing.level}")
+        # a moderator decides, not the bot
+        await mod_channel.send(f"{member.mention} is listed at level {listing.level}")
 ```
+
+Do not ban automatically on the register's answer alone: a fully automated
+decision that significantly affects someone falls under article 22 of the GDPR.
+Have a moderator look at the case first.
 
 | Method | Looks up | Informs |
 | --- | --- | --- |
@@ -126,8 +131,10 @@ async def on_member_join(member):
 | `audit(guild)` | every member, batched | no |
 | `inform(member, listing, channel=None)` | nothing | yes |
 
-`lookup` and `audit` inform nobody because they restrict nobody. The notice is
-owed when you act on the answer, not when you read it.
+`lookup` and `audit` send no individual notice. Querying the register is still
+processing personal data, even when the answer is "not listed": your privacy
+policy must say that your bot queries Trustcord and link to the notice. As soon
+as you restrict someone from an answer, go through `screen` or call `inform`.
 
 `inform` sends a direct message first, since the notice is addressed to the
 person and not to the server, and falls back to `channel` when their DMs are
@@ -182,18 +189,45 @@ registry = Registry(client, notice_url=…, notice=MY_NOTICE)
 The SDK screens and informs. Whether to act on a listing, and how hard, is your
 decision: for what your bot does with the answer, you are the controller, and
 the person you restricted comes to you, not to Trustcord. A `high` listing
-means a jury thought the facts might be criminal; it is not a conviction.
+means a jury found a threat to someone's life or safety; the jury never rules on
+whether the facts are criminal, and a listing is not a conviction.
 
 ## Levels
 
 | Level | What the jury found |
 | --- | --- |
-| `Level.LOW` | a lapse, nothing grave |
-| `Level.MEDIUM` | conduct Discord itself forbids |
-| `Level.HIGH` | facts that may be criminal; reported to Pharos |
+| `Level.LOW` | inappropriate behaviour, such as spam or a one-off insult |
+| `Level.MEDIUM` | a serious or repeated breach of Discord's rules, such as a raid or harassment |
+| `Level.HIGH` | a threat to someone's life or safety; reported to the authorities through Pharos |
 
 They compare by gravity, so `listing.level >= Level.MEDIUM` reads the way it
 sounds. A plain string comparison would sort `high` below `low`.
+
+## Update webhook
+
+If your bot keeps answers, declare a webhook URL (https, public host) on your
+application's page on trustcord.org; the secret is shown once. When a listing is
+lifted or its level changes, Trustcord posts within the hour the keyed hashes of
+the accounts concerned, never their IDs. Hash the IDs you hold with the same
+secret and look the matching ones up again:
+
+```python
+import json
+
+from trustcord.webhook import changed, verify
+
+def on_trustcord_webhook(body: bytes, headers: dict[str, str]) -> int:
+    if not verify(SECRET, body, headers["X-Trustcord-Timestamp"],
+                  headers["X-Trustcord-Signature"]):
+        return 401
+    for discord_id in changed(SECRET, json.loads(body)["accounts"], cached_ids()):
+        forget(discord_id)   # drop the cached answer, look it up again
+    return 204
+```
+
+Answer with a 2xx status; otherwise the delivery is retried every hour, up to
+24 times. Without a webhook, the terms require you to look a kept answer up
+again at least every 24 hours.
 
 ## Development
 

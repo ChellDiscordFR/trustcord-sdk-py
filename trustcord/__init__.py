@@ -2,7 +2,7 @@
 
 ``trustcord.discord_ext`` is imported separately and needs discord.py; this
 module stays usable without it, so a bot on another library only pays for the
-HTTP client.
+HTTP client. ``trustcord.webhook`` checks and matches update notifications.
 """
 
 from trustcord.client import (
